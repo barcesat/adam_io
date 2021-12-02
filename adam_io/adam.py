@@ -138,7 +138,6 @@ class Adam6024D:
                 key = int(key.replace("DO", ""))
                 if val is not None:
                     current_do[key] = digital_output[key]
-            print(current_do)
             response = self.requestor.d_output(current_do.as_dict())
             root = ElementTree.fromstring(response)
             status = root.attrib['status']
@@ -191,12 +190,10 @@ class Adam6024D:
         if analog_output:
             current_state = self.requestor.a_output()
             current_ao = AnalogOutput(xml_string=current_state)
-            # print(current_ao)
             for key, val in analog_output:
                 key = int(key.replace("AO", ""))
                 if val is not None:
                     current_ao[key] = analog_output[key]
-            # print(current_ao)
             response = self.requestor.a_output(current_ao.as_dict())
             root = ElementTree.fromstring(response)
             status = root.attrib['status']

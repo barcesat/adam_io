@@ -44,7 +44,7 @@ class AnalogOutput:
             raise Exception("something wrong with the response, status is:", status)
 
         # convert xml to dictionary
-        values = [int(di_element.text) for di in root for di_element in di if di_element.tag == "VALUE"]
+        values = [int("0x"+di_element.text, 16) for di in root for di_element in di if di_element.tag == "VALUE"]
         keys = ["AO" + di_element.text for di in root for di_element in di if di_element.tag == "ID"]
         return dict(zip(keys, values))
 
@@ -121,13 +121,14 @@ class AnalogInput:
             raise Exception("something wrong with the response, status is:", status)
 
         # convert xml to dictionary
-        values = [int(di_element.text) for di in root for di_element in di if di_element.tag == "VALUE"]
+        values = [int("0x"+di_element.text, 16) for di in root for di_element in di if di_element.tag == "VALUE"]
+        # values = [di_element.text for di in root for di_element in di if di_element.tag == "VALUE"]
         keys = ["AI" + di_element.text for di in root for di_element in di if di_element.tag == "ID"]
         self._di = dict(zip(keys, values))
 
     def __getitem__(self, di_id: int):
-        if type(di_id) != int:
-            raise TypeError("analog input id should be integer")
+        # if type(di_id) != int:
+        #     raise TypeError("analog input id should be integer")
         return self._di[f"AI{di_id}"]
 
     def __iter__(self):
