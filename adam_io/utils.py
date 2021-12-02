@@ -27,5 +27,7 @@ def valid_ipv4(address: str):
 class URI:
     DIGITAL_INPUT = "/digitalinput"
     DIGITAL_OUTPUT = "/digitaloutput"
+    ANALOG_INPUT = "/analoginput"
+    ANALOG_OUTPUT = "/analogoutput"
     ALL = "/all"
     VALUE = "/value"

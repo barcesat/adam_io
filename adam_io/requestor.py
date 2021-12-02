@@ -21,7 +21,7 @@ class Requestor:
                         "Authorization": "Basic " + encoded_auth_str}
         self.base_url = f"http://{ip}"
 
-    def input(self, input_channel_id: Optional[int] = None):
+    def d_input(self, input_channel_id: Optional[int] = None):
         """
         if the requests digital output index is out of bounds,
         request returns status code 501.
@@ -38,7 +38,7 @@ class Requestor:
         response = urlopen(request)
         return response.read().decode('utf8')
 
-    def output(self, data: Optional[Dict[str, int]] = None):
+    def d_output(self, data: Optional[Dict[str, int]] = None):
         """
         if the requests digital output index is out of bounds,
         request returns status code 501.
@@ -47,12 +47,53 @@ class Requestor:
         :return: ADAM response, xml response with status code/message
         """
         url = self.base_url + URI.DIGITAL_OUTPUT + URI.ALL + URI.VALUE
-
+        # print(url)
         if data:
             params = urlencode(data).encode('utf-8')
+            print(params)
             request = Request(url, data=params, headers=self.headers)
+            print(request.header_items())
         else:
             request = Request(url, headers=self.headers)
 
         response = urlopen(request)
+        return response.read().decode('utf8')
+
+    def a_input(self, input_channel_id: Optional[int] = None):
+        """
+        if the requests analog output index is out of bounds,
+        request returns status code 501.
+
+        :param input_channel_id: single input is requested, none returns all analog inputs
+        :return: ADAM response, xml response with status code/message
+        """
+        if input_channel_id:
+            input_channel_id = "/" + str(input_channel_id)
+            url = self.base_url + URI.ANALOG_INPUT + input_channel_id + URI.VALUE
+        else:
+            url = self.base_url + URI.ANALOG_INPUT + URI.ALL + URI.VALUE
+        request = Request(url, headers=self.headers)
+        response = urlopen(request)
+        return response.read().decode('utf8')
+
+    def a_output(self, data: Optional[Dict[str, int]] = None):
+        """
+        if the requests analog output index is out of bounds,
+        request returns status code 501.
+
+        :param data: ANALOGOutput object converted to dictionary as {"AO1":1,...}
+        :return: ADAM response, xml response with status code/message
+        """
+        url = self.base_url + URI.ANALOG_OUTPUT + URI.ALL + URI.VALUE
+        print(url)
+        if data:
+            params = urlencode(data).encode('utf-8')
+            print("params: ",params)
+            request = Request(url, data=params, headers=self.headers)
+            print("Request: ",request.header_items)
+        else:
+            request = Request(url, headers=self.headers)
+        
+        response = urlopen(request)
+        print(response.read().decode('utf8'))
         return response.read().decode('utf8')
