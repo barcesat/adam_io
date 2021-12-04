@@ -31,3 +31,4 @@ class URI:
     ANALOG_OUTPUT = "/analogoutput"
     ALL = "/all"
     VALUE = "/value"
+    RANGE = "/range"

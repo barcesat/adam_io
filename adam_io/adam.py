@@ -7,7 +7,7 @@ Main ADAM module to make the requests for input and output operations
 from xml.etree import ElementTree
 
 from .digital_io import DigitalInput, DigitalOutput
-from .analog_io import AnalogInput, AnalogOutput
+from .analog_io import AnalogInput, AnalogInputRange, AnalogOutput, AnalogOutputRange
 from .requestor import Requestor
 from .utils import valid_ipv4
 from typing import Optional
@@ -204,6 +204,32 @@ class Adam6024D:
             response = self.requestor.a_output(analog_output)
             return AnalogOutput(xml_string=response)
 
+    def a_output_range(self, analog_output: Optional[AnalogOutput] = None):
+        """
+        This prepares the data and sends it over to ADAM.
+
+        :param analog_output_range: AnalogOutput, if the analog_output is None, read the ranges, not set them.
+        :return: True for success, raises an exception if unsuccessful
+        """
+
+        # set the value(s) of the current state to that of input's
+        if analog_output:
+            current_state = self.requestor.a_output_range()
+            current_ao = AnalogOutputRange(xml_string=current_state)
+            for key, val in analog_output:
+                key = int(key.replace("AO", ""))
+                if val is not None:
+                    current_ao[key] = analog_output[key]
+            response = self.requestor.a_output_range(current_ao.as_dict())
+            root = ElementTree.fromstring(response)
+            status = root.attrib['status']
+            if status != "OK":
+                raise Exception("Couldn't update output: ", status)
+            return True
+        else:
+            response = self.requestor.a_output_range(analog_output)
+            return AnalogOutput(xml_string=response)
+
     def a_input(self, analog_input_id: Optional[int] = None):
 
         """
@@ -214,3 +240,14 @@ class Adam6024D:
         """
         response = self.requestor.a_input(analog_input_id)
         return AnalogInput(response)
+    
+    def a_input_range(self, analog_input_id: Optional[int] = None):
+
+        """
+        Read the values of the analog inputs
+
+        :param analog_input_id: DIx if the analog_input_id is None, read the all values
+        :return: ADAM response
+        """
+        response = self.requestor.a_input_range(analog_input_id)
+        return AnalogInputRange(response)

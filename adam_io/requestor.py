@@ -72,6 +72,23 @@ class Requestor:
         request = Request(url, headers=self.headers)
         response = urlopen(request)
         return response.read().decode('utf8')
+    
+    def a_input_range(self, input_channel_id: Optional[int] = None):
+        """
+        if the requests analog output index is out of bounds,
+        request returns status code 501.
+
+        :param input_channel_id: single input is requested, none returns all analog inputs
+        :return: ADAM response, xml response with status code/message
+        """
+        if input_channel_id:
+            input_channel_id = "/" + str(input_channel_id)
+            url = self.base_url + URI.ANALOG_INPUT + input_channel_id + URI.RANGE
+        else:
+            url = self.base_url + URI.ANALOG_INPUT + URI.ALL + URI.RANGE
+        request = Request(url, headers=self.headers)
+        response = urlopen(request)
+        return response.read().decode('utf8')
 
     def a_output(self, data: Optional[Dict[str, int]] = None):
         """
@@ -82,6 +99,24 @@ class Requestor:
         :return: ADAM response, xml response with status code/message
         """
         url = self.base_url + URI.ANALOG_OUTPUT + URI.ALL + URI.VALUE
+        if data:
+            params = urlencode(data).encode('utf-8')
+            request = Request(url, data=params, headers=self.headers)
+        else:
+            request = Request(url, headers=self.headers)
+        
+        response = urlopen(request)
+        return response.read().decode('utf8')
+    
+    def a_output_range(self, data: Optional[Dict[str, int]] = None):
+        """
+        if the requests analog output index is out of bounds,
+        request returns status code 501.
+
+        :param data: ANALOGOutput object converted to dictionary as {"AO1":1,...}
+        :return: ADAM response, xml response with status code/message
+        """
+        url = self.base_url + URI.ANALOG_OUTPUT + URI.ALL + URI.RANGE
         if data:
             params = urlencode(data).encode('utf-8')
             request = Request(url, data=params, headers=self.headers)
